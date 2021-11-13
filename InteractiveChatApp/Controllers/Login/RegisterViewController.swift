@@ -131,9 +131,31 @@ class RegisterViewController: UIViewController {
                     print("Creating user error")
                     return
                 }
-                DatabaseManager.shared.insertUser(with: ChatAppUser(firstName: firstname,
-                                                                    lastName: lastname,
-                                                                    emailAddress: email ))
+                let chatAppUser = ChatAppUser(firstName: firstname,
+                                             lastName: lastname,
+                                             emailAddress: email )
+                DatabaseManager.shared.insertUser(with: chatAppUser,
+                                                  completion: { success in
+                    if success {
+                        //upload image
+                        guard let image = strongSelf.imageView.image,
+                              let data = image.pngData() else {
+                                  print("profile picture upload failed")
+                                  return
+                              }
+                        let filename = chatAppUser.profilePictureName
+                        StorageManeger.shared.uploadProfilePicture(with: data,
+                                                                   fileName: filename,
+                                                                   completion: { result in
+                            switch result {
+                            case .success(let downloadURL) :
+                                UserDefaults.standard.set(downloadURL, forKey: "profile_picture_url")
+                            case .failure(let downloadError) :
+                                print("Download url error, \(downloadError)")
+                            }
+                        })
+                    }
+                })
                 strongSelf.navigationController?.dismiss(animated: true, completion: nil)
             })
         })
