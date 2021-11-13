@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class LoginViewController: UIViewController {
 
@@ -51,6 +52,7 @@ class LoginViewController: UIViewController {
                                  y: 50,
                                  width: scrollView.width/3,
                                  height: scrollView.width/3)
+        imageView.layer.cornerRadius = imageView.width / 2
         emailField.frame = CGRect(x: 30 ,
                                   y: imageView.bottom + 10,
                                   width: scrollView.width - 60,
@@ -83,6 +85,17 @@ class LoginViewController: UIViewController {
               }
         
         // === Firebase log in logic
+        FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password, completion: { [weak self] authResult, error in
+            guard let strongSelf = self else { return }
+            guard let result = authResult, error == nil else {
+                print("failed to log in")
+                return
+            }
+            let user = result.user
+            print("new user log in \(user)")
+            strongSelf.navigationController?.dismiss(animated: true, completion: nil)
+        })
+        
     }
     
     func alertUserLoginError() {
@@ -107,6 +120,10 @@ class LoginViewController: UIViewController {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "Logo")
         imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = .gray
+        imageView.layer.masksToBounds = true
+        imageView.layer.borderWidth = 2
+        imageView.layer.borderColor = UIColor.link.cgColor
         return imageView
     }()
     
