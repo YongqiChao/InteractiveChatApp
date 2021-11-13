@@ -6,24 +6,57 @@
 //
 
 import UIKit
+import JGProgressHUD
 
 class NewConversationViewController: UIViewController {
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        view.backgroundColor = .white
+        searchBar.delegate = self
+        navigationController?.navigationBar.topItem?.titleView = searchBar
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Close",
+                                                            style: .done,
+                                                            target: self,
+                                                            action: #selector(dismissSelf))
+        searchBar.becomeFirstResponder()
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    // views
+    private let spinner = JGProgressHUD()
+    
+    private let searchBar: UISearchBar = {
+        let searchBar = UISearchBar()
+        searchBar.placeholder = "Search for friends ... "
+        return searchBar
+    }()
+    
+    private let tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.isHidden = true
+        tableView.register(UITableViewCell.self,
+                           forCellReuseIdentifier: "cell")
+        return tableView
+    }()
+    
+    private let noResultLabel : UILabel = {
+        let noResultLabel = UILabel()
+        noResultLabel.text = "No Results"
+        noResultLabel.textAlignment = .center
+        noResultLabel.font = .systemFont(ofSize: 20, weight: .medium)
+        noResultLabel.textColor = .red
+        noResultLabel.isHidden = true
+        return noResultLabel
+    }()
+    
+    // funcs
+    @objc private func dismissSelf() {
+        dismiss(animated: true, completion: nil)
     }
-    */
+}
 
+extension NewConversationViewController : UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+    }
 }
