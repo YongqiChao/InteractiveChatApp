@@ -137,6 +137,9 @@ class RegisterViewController: UIViewController {
                 DatabaseManager.shared.insertUser(with: chatAppUser,
                                                   completion: { success in
                     if success {
+                        UserDefaults.standard.set(email, forKey: "email")
+                        UserDefaults.standard.set(password, forKey: "password")
+                        print("new user log in \(email)")
                         //upload image
                         guard let image = strongSelf.imageView.image,
                               let data = image.pngData() else {
@@ -202,10 +205,12 @@ class RegisterViewController: UIViewController {
         firstNameField.layer.cornerRadius = 10
         firstNameField.layer.borderWidth = 1
         firstNameField.layer.borderColor = UIColor.lightGray.cgColor
-        firstNameField.placeholder = "Enter firstname"
+        firstNameField.attributedPlaceholder = NSAttributedString(string: "Enter firstname",
+                                                       attributes: [NSAttributedString.Key.foregroundColor: UIColor.black])
         firstNameField.backgroundColor = .white
         firstNameField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 0))
         firstNameField.leftViewMode = .always
+        firstNameField.textColor = .black
         return firstNameField
     }()
     
@@ -217,10 +222,12 @@ class RegisterViewController: UIViewController {
         lastNameField.layer.cornerRadius = 10
         lastNameField.layer.borderWidth = 1
         lastNameField.layer.borderColor = UIColor.lightGray.cgColor
-        lastNameField.placeholder = "Enter lastname"
+        lastNameField.attributedPlaceholder = NSAttributedString(string: "Enter lastname",
+                                                       attributes: [NSAttributedString.Key.foregroundColor: UIColor.black])
         lastNameField.backgroundColor = .white
         lastNameField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 0))
         lastNameField.leftViewMode = .always
+        lastNameField.textColor = .black
         return lastNameField
     }()
     
@@ -232,10 +239,12 @@ class RegisterViewController: UIViewController {
         emailField.layer.cornerRadius = 10
         emailField.layer.borderWidth = 1
         emailField.layer.borderColor = UIColor.lightGray.cgColor
-        emailField.placeholder = "Enter email address"
+        emailField.attributedPlaceholder = NSAttributedString(string: "Enter email address",
+                                                       attributes: [NSAttributedString.Key.foregroundColor: UIColor.black])
         emailField.backgroundColor = .white
         emailField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 0))
         emailField.leftViewMode = .always
+        emailField.textColor = .black
         return emailField
     }()
     
@@ -247,11 +256,13 @@ class RegisterViewController: UIViewController {
         passwordField.layer.cornerRadius = 10
         passwordField.layer.borderWidth = 1
         passwordField.layer.borderColor = UIColor.lightGray.cgColor
-        passwordField.placeholder = "Enter password"
+        passwordField.attributedPlaceholder = NSAttributedString(string: "Enter password",
+                                                       attributes: [NSAttributedString.Key.foregroundColor: UIColor.black])
         passwordField.backgroundColor = .white
         passwordField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 0))
         passwordField.leftViewMode = .always
         passwordField.isSecureTextEntry = true
+        passwordField.textColor = .black
         return passwordField
     }()
     

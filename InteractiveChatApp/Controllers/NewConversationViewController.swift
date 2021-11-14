@@ -70,6 +70,9 @@ class NewConversationViewController: UIViewController {
     @objc private func dismissSelf() {
         dismiss(animated: true, completion: nil)
     }
+    
+    public var completion : (([String: String]) -> (Void))?
+    
 }
 
 extension NewConversationViewController : UISearchBarDelegate {
@@ -88,20 +91,22 @@ extension NewConversationViewController : UISearchBarDelegate {
         if hasFetchedUsers {
             //have result
             filterUsers(with: username)
+            self.updateUI()
         } else {
             // no result, create new
             DatabaseManager.shared.fetchAllUsers(completion: { [weak self] result in
                 switch result {
                 case .failure(let error) :
                     print("Failed fetch all useres \(error)")
+                    self?.updateUI()
                 case .success(let usersCollection) :
                     self?.hasFetchedUsers = true
                     self?.users = usersCollection
                     self?.filterUsers(with: username)
+                    self?.updateUI()
                 }
             })
         }
-        updateUI()
     }
     
     func updateUI() {
@@ -148,6 +153,11 @@ extension NewConversationViewController : UITableViewDelegate, UITableViewDataSo
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         // start new conversation
+        let targetUserData = userFilterResult[indexPath.row]
         
+        dismiss(animated: true, completion: { [weak self] in
+            self?.completion?(targetUserData)
+        })
     }
+    
 }

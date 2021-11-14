@@ -150,10 +150,12 @@ class LoginViewController: UIViewController {
         emailField.layer.cornerRadius = 10
         emailField.layer.borderWidth = 1
         emailField.layer.borderColor = UIColor.lightGray.cgColor
-        emailField.placeholder = "Enter email address"
+        emailField.attributedPlaceholder = NSAttributedString(string: "Enter email address",
+                                                       attributes: [NSAttributedString.Key.foregroundColor: UIColor.black])
         emailField.backgroundColor = .white
         emailField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 0))
         emailField.leftViewMode = .always
+        emailField.textColor = .black
         return emailField
     }()
     
@@ -165,11 +167,13 @@ class LoginViewController: UIViewController {
         passwordField.layer.cornerRadius = 10
         passwordField.layer.borderWidth = 1
         passwordField.layer.borderColor = UIColor.lightGray.cgColor
-        passwordField.placeholder = "Enter password"
+        passwordField.attributedPlaceholder = NSAttributedString(string: "Enter password",
+                                                       attributes: [NSAttributedString.Key.foregroundColor: UIColor.black])
         passwordField.backgroundColor = .white
         passwordField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 0))
         passwordField.leftViewMode = .always
         passwordField.isSecureTextEntry = true
+        passwordField.textColor = .black
         return passwordField
     }()
     
