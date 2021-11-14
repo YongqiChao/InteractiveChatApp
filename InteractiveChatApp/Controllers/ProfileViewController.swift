@@ -19,18 +19,61 @@ class ProfileViewController: UIViewController {
                            forCellReuseIdentifier: "cell")
         tableView.delegate = self
         tableView.dataSource = self
-        // Do any additional setup after loading the view.
+        tableView.tableHeaderView = createTableHeaderView()
     }
     
-    /*
-     // MARK: - Navigation
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-     // Get the new view controller using segue.destination.
-     // Pass the selected object to the new view controller.
-     }
-     */
+    // funcs
+    func createTableHeaderView()  -> UIView? {
+        guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
+            return nil
+        }
+        
+        let saftEmail = DatabaseManager.safeEmail(emailAddress: email)
+        let filename = saftEmail + "_profile_picture.png"
+        let path = "images/" + filename
+        
+        let headerView = UIView(frame: CGRect(x: 0,
+                                        y: 0,
+                                        width: self.view.width,
+                                        height: 300))
+        headerView.backgroundColor = .link
+        let imageView = UIImageView(frame: CGRect(x: (headerView.width - 150) / 2,
+                                                  y: 75,
+                                                  width: 150,
+                                                  height: 150))
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.borderColor = UIColor.white.cgColor
+        imageView.layer.borderWidth = 3
+        imageView.layer.cornerRadius = imageView.width/2
+        imageView.layer.masksToBounds = true
+        imageView.backgroundColor = .white
+        headerView.addSubview(imageView)
+        
+        StorageManeger.shared.downloadURL(for: path,
+                                             completion: { [weak self] result in
+            switch result {
+            case .failure(let error) :
+                print("Failed to get download url : \(error)")
+            case .success(let url) :
+                self?.downloadImage(imageView: imageView, url: url)
+            }
+        })
+        return headerView
+    }
+    
+    func downloadImage(imageView : UIImageView, url : URL) {
+        URLSession.shared.dataTask(with: url, completionHandler: { data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            DispatchQueue.main.async {
+                let image = UIImage(data: data)
+                imageView.image = image
+            }
+        }).resume()
+    }
+    
 }
 
 extension ProfileViewController : UITableViewDelegate , UITableViewDataSource {

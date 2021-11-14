@@ -7,6 +7,7 @@
 
 import Foundation
 import FirebaseStorage
+import SwiftUI
 
 final class StorageManeger {
     
@@ -44,5 +45,17 @@ final class StorageManeger {
     public enum StorageErrors: Error {
         case failedToUpload
         case failedToDownloadUrl
+    }
+    
+    public func downloadURL(for path : String,
+                            completion : @escaping (Result<URL, Error>) -> Void ) {
+        let reference = storage.child(path)
+        reference.downloadURL(completion: { url, error in
+            guard let url = url, error == nil else {
+                completion(.failure(StorageErrors.failedToDownloadUrl))
+                return
+            }
+            completion(.success(url))
+        })
     }
 }
