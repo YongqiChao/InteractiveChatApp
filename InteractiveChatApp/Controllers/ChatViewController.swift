@@ -30,10 +30,14 @@ class ChatViewController: MessagesViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         messageInputBar.inputTextView.becomeFirstResponder()
+        if let conversationId = conversationId {
+            listenForMessages(id: conversationId, shouldScrollToBottom: true)
+        }
     }
     
-    init(with email: String) {
+    init(with email: String, id : String?) {
         self.otherUserEmail = email
+        self.conversationId = id
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -43,6 +47,7 @@ class ChatViewController: MessagesViewController {
     
     // data
     public let otherUserEmail: String
+    private let conversationId: String?
     public var isNewConversation = false
     private var messages = [Message]()
     public static let dateFormatter : DateFormatter = {
@@ -58,10 +63,35 @@ class ChatViewController: MessagesViewController {
         guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
             return nil
         }
-        return Sender(senderId: email,
+        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+        return Sender(senderId: safeEmail,
                displayName: "123",
                photoURL: "")
     }()
+    
+    //funcs
+    private func listenForMessages(id : String, shouldScrollToBottom : Bool) {
+        DatabaseManager.shared.getAllMessagesForConversation(with: id,
+                                                             completion: { [weak self] result in
+            switch result {
+            case . failure(let error) :
+                print("Failed to listen all messages for a conversation: \(error)")
+            case .success(let messages) :
+                guard !messages.isEmpty else {
+                    print("There is no message in this chat")
+                    return
+                }
+                self?.messages = messages
+                DispatchQueue.main.async {
+                    print("reloading ... ... ... messages ...")
+                    self?.messagesCollectionView.reloadDataAndKeepOffset()
+                    if shouldScrollToBottom {
+                        self?.messagesCollectionView.scrollToLastItem()
+                    }
+                }
+            }
+        })
+    }
     
 }
 
@@ -115,7 +145,6 @@ extension ChatViewController : MessagesLayoutDelegate,
             return sender
         }
         fatalError("Error : self sender is nil, no email was cached")
-        return Sender(senderId: "", displayName: "", photoURL: "")
     }
     
     func messageForItem(at indexPath: IndexPath,

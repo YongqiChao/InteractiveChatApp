@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SDWebImage
 
 class ConversationTableViewCell: UITableViewCell {
 
@@ -35,8 +36,8 @@ class ConversationTableViewCell: UITableViewCell {
         super.layoutSubviews()
         userImageView.frame = CGRect(x: 10,
                                      y: 10,
-                                     width: 100,
-                                     height: 100)
+                                     width: 80,
+                                     height: 80)
         userNameLabel.frame = CGRect(x: userImageView.right + 10,
                                      y: 10,
                                      width: contentView.width - 20 - userImageView.width,
@@ -51,7 +52,7 @@ class ConversationTableViewCell: UITableViewCell {
     private let userImageView : UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = 50
+        imageView.layer.cornerRadius = 40
         imageView.layer.masksToBounds = true
         return imageView
     }()
@@ -66,7 +67,7 @@ class ConversationTableViewCell: UITableViewCell {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
         // number of lines to render , 0 is no limitation
-        label.numberOfLines = 0  //2 
+        label.numberOfLines = 0 // 2
         return label
     }()
 
@@ -74,8 +75,22 @@ class ConversationTableViewCell: UITableViewCell {
     static let identifier = "ConversationTableViewCell"
     
     // funcs
-    public func configure(with model : String) {
+    public func configure(with model : Conversation) {
+        self.userMessageLabel.text = model.latestMessage.text
+        self.userNameLabel.text = model.otherUserName
         
+        let path = "images/\(model.otherUserEmail)_profile_picture.png"
+        StorageManeger.shared.downloadURL(for: path,
+                                             completion: { [weak self] result in
+            switch result {
+            case .failure(let error) :
+                print("Failed to download image for chat: \(error)")
+            case .success(let url) :
+                DispatchQueue.main.async {
+                    self?.userImageView.sd_setImage(with: url, completed: nil)
+                }
+            }
+        })
     }
 
 }
