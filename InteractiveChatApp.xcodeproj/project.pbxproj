@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0282F02845CD5BE6AA7792DD /* awsconfiguration.json in Resources */ = {isa = PBXBuildFile; fileRef = 9272D183EEB6D0751F979F4C /* awsconfiguration.json */; };
 		699D21AB56A02584DF86B8BC /* Pods_InteractiveChatApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2EFC0F03CC8B4CA8FA6BC155 /* Pods_InteractiveChatApp.framework */; };
 		8643F8FC273A4439004493BF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8643F8FB273A4439004493BF /* AppDelegate.swift */; };
 		8643F8FE273A4439004493BF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8643F8FD273A4439004493BF /* SceneDelegate.swift */; };
@@ -19,17 +20,22 @@
 		8643F91E273AE620004493BF /* PhotoViewerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8643F91D273AE620004493BF /* PhotoViewerViewController.swift */; };
 		8643F920273AE680004493BF /* VideoPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8643F91F273AE680004493BF /* VideoPlayerViewController.swift */; };
 		8643F922273AE698004493BF /* NewConversationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8643F921273AE698004493BF /* NewConversationViewController.swift */; };
-		8643F924273AE6B0004493BF /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8643F923273AE6B0004493BF /* ProfileViewController.swift */; };
 		8643F927273B8548004493BF /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8643F926273B8548004493BF /* Extensions.swift */; };
 		8643F929273E91B8004493BF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8643F928273E91B7004493BF /* GoogleService-Info.plist */; };
 		8643F92B273EAAFB004493BF /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8643F92A273EAAFB004493BF /* DatabaseManager.swift */; };
 		8643F92D273F9A08004493BF /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8643F92C273F9A08004493BF /* ChatViewController.swift */; };
 		8643F92F273FF0DC004493BF /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8643F92E273FF0DC004493BF /* StorageManager.swift */; };
 		8645C26F2742141100E681AE /* ConversationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8645C26E2742141100E681AE /* ConversationTableViewCell.swift */; };
+		86A29F1F2744AA3600124E9C /* ChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A29F1E2744AA3600124E9C /* ChatModel.swift */; };
+		86A29F232744CA5A00124E9C /* awsconfiguration.json in Resources */ = {isa = PBXBuildFile; fileRef = 86A29F212744CA5A00124E9C /* awsconfiguration.json */; };
+		86A29F252744CAAE00124E9C /* amplifyconfiguration.json in Resources */ = {isa = PBXBuildFile; fileRef = 86A29F242744CAAE00124E9C /* amplifyconfiguration.json */; };
+		86A29F272744CAF300124E9C /* Backend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A29F262744CAF300124E9C /* Backend.swift */; };
+		FA389BF133B1F8B64C74E616 /* amplifyconfiguration.json in Resources */ = {isa = PBXBuildFile; fileRef = 555CC56CC210A12EBEEC5580 /* amplifyconfiguration.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		2EFC0F03CC8B4CA8FA6BC155 /* Pods_InteractiveChatApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InteractiveChatApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		555CC56CC210A12EBEEC5580 /* amplifyconfiguration.json */ = {isa = PBXFileReference; explicitFileType = text.json; path = amplifyconfiguration.json; sourceTree = "<group>"; };
 		8643F8F8273A4439004493BF /* InteractiveChatApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InteractiveChatApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8643F8FB273A4439004493BF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8643F8FD273A4439004493BF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -43,13 +49,17 @@
 		8643F91D273AE620004493BF /* PhotoViewerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewerViewController.swift; sourceTree = "<group>"; };
 		8643F91F273AE680004493BF /* VideoPlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerViewController.swift; sourceTree = "<group>"; };
 		8643F921273AE698004493BF /* NewConversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewConversationViewController.swift; sourceTree = "<group>"; };
-		8643F923273AE6B0004493BF /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		8643F926273B8548004493BF /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		8643F928273E91B7004493BF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		8643F92A273EAAFB004493BF /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		8643F92C273F9A08004493BF /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		8643F92E273FF0DC004493BF /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 		8645C26E2742141100E681AE /* ConversationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationTableViewCell.swift; sourceTree = "<group>"; };
+		86A29F1E2744AA3600124E9C /* ChatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModel.swift; sourceTree = "<group>"; };
+		86A29F212744CA5A00124E9C /* awsconfiguration.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = awsconfiguration.json; sourceTree = "<group>"; };
+		86A29F242744CAAE00124E9C /* amplifyconfiguration.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = amplifyconfiguration.json; sourceTree = "<group>"; };
+		86A29F262744CAF300124E9C /* Backend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend.swift; sourceTree = "<group>"; };
+		9272D183EEB6D0751F979F4C /* awsconfiguration.json */ = {isa = PBXFileReference; explicitFileType = text.json; path = awsconfiguration.json; sourceTree = "<group>"; };
 		BA9AD3EEC0C0C4E2EADDBD26 /* Pods-InteractiveChatApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InteractiveChatApp.release.xcconfig"; path = "Target Support Files/Pods-InteractiveChatApp/Pods-InteractiveChatApp.release.xcconfig"; sourceTree = "<group>"; };
 		F237B3932E1AB3CBCA1D1EC4 /* Pods-InteractiveChatApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InteractiveChatApp.debug.xcconfig"; path = "Target Support Files/Pods-InteractiveChatApp/Pods-InteractiveChatApp.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -78,11 +88,14 @@
 		8643F8EF273A4439004493BF = {
 			isa = PBXGroup;
 			children = (
+				86A29F212744CA5A00124E9C /* awsconfiguration.json */,
+				86A29F242744CAAE00124E9C /* amplifyconfiguration.json */,
 				8643F8FA273A4439004493BF /* InteractiveChatApp */,
 				8643F915273AE1B0004493BF /* Products */,
 				8643F8F9273A4439004493BF /* Products */,
 				5F396838429623DF1C1B8320 /* Pods */,
 				BD3017F1A536AD7E689057EA /* Frameworks */,
+				B7CCFFF13DC6EFA9D689A2CD /* AmplifyConfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -117,7 +130,6 @@
 				8643F92C273F9A08004493BF /* ChatViewController.swift */,
 				8643F91D273AE620004493BF /* PhotoViewerViewController.swift */,
 				8643F91F273AE680004493BF /* VideoPlayerViewController.swift */,
-				8643F923273AE6B0004493BF /* ProfileViewController.swift */,
 				8645C26E2742141100E681AE /* ConversationTableViewCell.swift */,
 			);
 			path = Controllers;
@@ -135,6 +147,8 @@
 		8643F913273AE193004493BF /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				86A29F1E2744AA3600124E9C /* ChatModel.swift */,
+				86A29F262744CAF300124E9C /* Backend.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -181,6 +195,15 @@
 				8643F919273AE51A004493BF /* LoginViewController.swift */,
 			);
 			path = Login;
+			sourceTree = "<group>";
+		};
+		B7CCFFF13DC6EFA9D689A2CD /* AmplifyConfig */ = {
+			isa = PBXGroup;
+			children = (
+				9272D183EEB6D0751F979F4C /* awsconfiguration.json */,
+				555CC56CC210A12EBEEC5580 /* amplifyconfiguration.json */,
+			);
+			name = AmplifyConfig;
 			sourceTree = "<group>";
 		};
 		BD3017F1A536AD7E689057EA /* Frameworks */ = {
@@ -251,10 +274,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				86A29F232744CA5A00124E9C /* awsconfiguration.json in Resources */,
 				8643F908273A4439004493BF /* LaunchScreen.storyboard in Resources */,
 				8643F929273E91B8004493BF /* GoogleService-Info.plist in Resources */,
+				86A29F252744CAAE00124E9C /* amplifyconfiguration.json in Resources */,
 				8643F905273A4439004493BF /* Assets.xcassets in Resources */,
 				8643F903273A4439004493BF /* Main.storyboard in Resources */,
+				0282F02845CD5BE6AA7792DD /* awsconfiguration.json in Resources */,
+				FA389BF133B1F8B64C74E616 /* amplifyconfiguration.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -307,15 +334,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				86A29F272744CAF300124E9C /* Backend.swift in Sources */,
 				8643F91A273AE51A004493BF /* LoginViewController.swift in Sources */,
 				8643F92B273EAAFB004493BF /* DatabaseManager.swift in Sources */,
 				8643F91C273AE52F004493BF /* RegisterViewController.swift in Sources */,
 				8643F922273AE698004493BF /* NewConversationViewController.swift in Sources */,
 				8643F900273A4439004493BF /* ConversationsViewController.swift in Sources */,
+				86A29F1F2744AA3600124E9C /* ChatModel.swift in Sources */,
 				8643F920273AE680004493BF /* VideoPlayerViewController.swift in Sources */,
 				8643F927273B8548004493BF /* Extensions.swift in Sources */,
 				8643F8FC273A4439004493BF /* AppDelegate.swift in Sources */,
-				8643F924273AE6B0004493BF /* ProfileViewController.swift in Sources */,
 				8643F8FE273A4439004493BF /* SceneDelegate.swift in Sources */,
 				8645C26F2742141100E681AE /* ConversationTableViewCell.swift in Sources */,
 				8643F92D273F9A08004493BF /* ChatViewController.swift in Sources */,

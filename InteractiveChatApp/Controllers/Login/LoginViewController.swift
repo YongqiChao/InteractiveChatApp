@@ -6,7 +6,9 @@
 //
 
 import UIKit
+// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 import FirebaseAuth
+// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 import JGProgressHUD
 
 class LoginViewController: UIViewController {
@@ -87,6 +89,7 @@ class LoginViewController: UIViewController {
         
         spinner.show(in: view)
         
+        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         // === Firebase log in logic
         FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password, completion: { [weak self] authResult, error in
             guard let strongSelf = self else { return }
@@ -101,11 +104,27 @@ class LoginViewController: UIViewController {
                 return
             }
             let user = result.user
+            let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+            DatabaseManager.shared.getDataFor(path: safeEmail,
+                                              completion: { result in
+                switch result {
+                case .success(let data) :
+                    guard let userData = data as? [String : Any],
+                          let firstName = userData["first_name"] as? String,
+                          let lastName = userData["last_name"] as? String else {
+                        return
+                    }
+                    UserDefaults.standard.set("\(firstName) \(lastName)", forKey: "name")
+                case .failure(let error) :
+                    print("Failed to read data with error \(error)")
+                }
+            })
             UserDefaults.standard.set(email, forKey: "email")
             UserDefaults.standard.set(password, forKey: "password")
             print("new user log in \(user)")
             strongSelf.navigationController?.dismiss(animated: true, completion: nil)
         })
+        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         
     }
     

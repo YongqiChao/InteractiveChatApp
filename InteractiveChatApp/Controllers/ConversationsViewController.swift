@@ -6,7 +6,9 @@
 //
 
 import UIKit
+// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 import FirebaseAuth
+// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 import SwiftUI
 import JGProgressHUD
 
@@ -38,7 +40,9 @@ class ConversationsViewController: UIViewController {
     private func validateAuth() {
         //let loggedIn = UserDefaults.standard.bool(forKey: "loggedIn")
         //if !loggedIn {
+        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         if FirebaseAuth.Auth.auth().currentUser == nil {
+            // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
             let loginView = LoginViewController()
             let navigationView = UINavigationController(rootViewController: loginView)
             navigationView.modalPresentationStyle = .fullScreen
@@ -109,6 +113,7 @@ class ConversationsViewController: UIViewController {
         guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
             return
         }
+        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
         DatabaseManager.shared.getAllConversations(for: safeEmail, completion: { [weak self] result in
             switch result {
@@ -125,6 +130,7 @@ class ConversationsViewController: UIViewController {
                 }
             }
         })
+        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
     }
     
 }

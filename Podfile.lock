@@ -1,4 +1,42 @@
 PODS:
+  - Amplify (1.15.6):
+    - Amplify/Default (= 1.15.6)
+  - Amplify/Default (1.15.6)
+  - Amplify/Tools (1.15.6)
+  - AmplifyPlugins/AWSAPIPlugin (1.15.6):
+    - AppSyncRealTimeClient (~> 1.4)
+    - AWSCore (~> 2.26.1)
+    - AWSPluginsCore (= 1.15.6)
+  - AmplifyPlugins/AWSCognitoAuthPlugin (1.15.6):
+    - AWSAuthCore (~> 2.26.1)
+    - AWSCognitoIdentityProvider (~> 2.26.1)
+    - AWSCognitoIdentityProviderASF (~> 2.26.1)
+    - AWSCore (~> 2.26.1)
+    - AWSMobileClient (~> 2.26.1)
+    - AWSPluginsCore (= 1.15.6)
+  - AmplifyPlugins/AWSS3StoragePlugin (1.15.6):
+    - AWSCore (~> 2.26.1)
+    - AWSPluginsCore (= 1.15.6)
+    - AWSS3 (~> 2.26.1)
+  - AppSyncRealTimeClient (1.6.0):
+    - Starscream (~> 3.1.1)
+  - AWSAuthCore (2.26.4):
+    - AWSCore (= 2.26.4)
+  - AWSCognitoIdentityProvider (2.26.4):
+    - AWSCognitoIdentityProviderASF (= 2.26.4)
+    - AWSCore (= 2.26.4)
+  - AWSCognitoIdentityProviderASF (2.26.4)
+  - AWSCore (2.26.4)
+  - AWSMobileClient (2.26.4):
+    - AWSAuthCore (= 2.26.4)
+    - AWSCognitoIdentityProvider (= 2.26.4)
+    - AWSCognitoIdentityProviderASF (= 2.26.4)
+    - AWSCore (= 2.26.4)
+  - AWSPluginsCore (1.15.6):
+    - Amplify (= 1.15.6)
+    - AWSCore (~> 2.26.1)
+  - AWSS3 (2.26.4):
+    - AWSCore (= 2.26.4)
   - Firebase/Auth (8.9.1):
     - Firebase/CoreOnly
     - FirebaseAuth (~> 8.9.0)
@@ -121,8 +159,14 @@ PODS:
   - SDWebImage (5.12.1):
     - SDWebImage/Core (= 5.12.1)
   - SDWebImage/Core (5.12.1)
+  - Starscream (3.1.1)
 
 DEPENDENCIES:
+  - Amplify (~> 1.0)
+  - Amplify/Tools (~> 1.0)
+  - AmplifyPlugins/AWSAPIPlugin (~> 1.0)
+  - AmplifyPlugins/AWSCognitoAuthPlugin (~> 1.0)
+  - AmplifyPlugins/AWSS3StoragePlugin (~> 1.0)
   - Firebase/Auth
   - Firebase/Core
   - Firebase/Database
@@ -134,6 +178,16 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - Amplify
+    - AmplifyPlugins
+    - AppSyncRealTimeClient
+    - AWSAuthCore
+    - AWSCognitoIdentityProvider
+    - AWSCognitoIdentityProviderASF
+    - AWSCore
+    - AWSMobileClient
+    - AWSPluginsCore
+    - AWSS3
     - Firebase
     - FirebaseAnalytics
     - FirebaseAuth
@@ -155,8 +209,19 @@ SPEC REPOS:
     - Realm
     - RealmSwift
     - SDWebImage
+    - Starscream
 
 SPEC CHECKSUMS:
+  Amplify: d6ec04316dd74852f6a968d89c0f8cab9947d4d5
+  AmplifyPlugins: 7cfe5a34e97c6091855c10d83ccda538fb371cd1
+  AppSyncRealTimeClient: 8b5ec94085b8ee9bb6fb9d9d76a157beb538ec6f
+  AWSAuthCore: 10fdd6eccf789389d32fc00790e605627e359e8f
+  AWSCognitoIdentityProvider: 677c7fdd1554d1ac66ebcd515047f626883cf2f9
+  AWSCognitoIdentityProviderASF: 2f1f5aa9f69244a88839f128ced10782b19b2717
+  AWSCore: ee7217d84a3ec7f6748462e7f765a794d47f23c6
+  AWSMobileClient: f1ad9a17ff292fbb673689c3442b72fce5467b86
+  AWSPluginsCore: 46b75ee57b0a1f10d64f4fa6b3b4153f5900dd4f
+  AWSS3: 4187a539eea3653901bf44276bb772322257c9c9
   Firebase: fb5114cd2bf96e2ff7bcb01d0d9a156cf5fd2f07
   FirebaseAnalytics: 4ab446ce08a3fe52e8a4303dd997cf26276bf968
   FirebaseAuth: 2b78b2a32c07b3ecfa4970bdf1d3632b8304099b
@@ -178,7 +243,8 @@ SPEC CHECKSUMS:
   Realm: 869ab2a7e3bdfa6bf06d8723251539f504e6f602
   RealmSwift: f1f51c4a02fe826e5cea623b5441992f06bdc942
   SDWebImage: 4dc3e42d9ec0c1028b960a33ac6b637bb432207b
+  Starscream: 4bb2f9942274833f7b4d296a55504dcfc7edb7b0
 
-PODFILE CHECKSUM: 66ea38acba1f11056a8ce7e26904972e066dfaba
+PODFILE CHECKSUM: 012ed0811275ddae191739980e8351a9549ba9ce
 
 COCOAPODS: 1.11.2

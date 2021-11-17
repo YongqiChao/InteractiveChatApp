@@ -6,7 +6,9 @@
 //
 
 import UIKit
+// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 import FirebaseAuth
+// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 class ProfileViewController: UIViewController {
     
@@ -49,6 +51,7 @@ class ProfileViewController: UIViewController {
         imageView.backgroundColor = .white
         headerView.addSubview(imageView)
         
+        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         StorageManeger.shared.downloadURL(for: path,
                                              completion: { [weak self] result in
             switch result {
@@ -58,6 +61,7 @@ class ProfileViewController: UIViewController {
                 self?.downloadImage(imageView: imageView, url: url)
             }
         })
+        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         return headerView
     }
     
@@ -100,14 +104,18 @@ extension ProfileViewController : UITableViewDelegate , UITableViewDataSource {
                                             handler: { [weak self] _ in
             guard let strongSelf = self else { return }
             do {
+                // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
                 try FirebaseAuth.Auth.auth().signOut()
+                // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
                 let loginView = LoginViewController()
                 let navigationView = UINavigationController(rootViewController: loginView)
                 navigationView.modalPresentationStyle = .fullScreen
                 strongSelf.present(navigationView, animated: true)
             }
             catch {
+                // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
                 print("firebase log out Failed")
+                // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
             }
         }))
         

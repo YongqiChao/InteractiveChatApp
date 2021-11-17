@@ -1,4 +1,14 @@
 ${PODS_ROOT}/Target Support Files/Pods-InteractiveChatApp/Pods-InteractiveChatApp-frameworks.sh
+${BUILT_PRODUCTS_DIR}/AWSAuthCore/AWSAuthCore.framework
+${BUILT_PRODUCTS_DIR}/AWSCognitoIdentityProvider/AWSCognitoIdentityProvider.framework
+${BUILT_PRODUCTS_DIR}/AWSCognitoIdentityProviderASF/AWSCognitoIdentityProviderASF.framework
+${BUILT_PRODUCTS_DIR}/AWSCore/AWSCore.framework
+${BUILT_PRODUCTS_DIR}/AWSMobileClient/AWSMobileClient.framework
+${BUILT_PRODUCTS_DIR}/AWSPluginsCore/AWSPluginsCore.framework
+${BUILT_PRODUCTS_DIR}/AWSS3/AWSS3.framework
+${BUILT_PRODUCTS_DIR}/Amplify/Amplify.framework
+${BUILT_PRODUCTS_DIR}/AmplifyPlugins/AmplifyPlugins.framework
+${BUILT_PRODUCTS_DIR}/AppSyncRealTimeClient/AppSyncRealTimeClient.framework
 ${BUILT_PRODUCTS_DIR}/FirebaseAuth/FirebaseAuth.framework
 ${BUILT_PRODUCTS_DIR}/FirebaseCore/FirebaseCore.framework
 ${BUILT_PRODUCTS_DIR}/FirebaseCoreDiagnostics/FirebaseCoreDiagnostics.framework
@@ -15,5 +25,6 @@ ${BUILT_PRODUCTS_DIR}/PromisesObjC/FBLPromises.framework
 ${BUILT_PRODUCTS_DIR}/Realm/Realm.framework
 ${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework
 ${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework
+${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework
 ${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework
 ${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework

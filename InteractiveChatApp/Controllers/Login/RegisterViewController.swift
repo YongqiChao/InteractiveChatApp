@@ -6,7 +6,9 @@
 //
 
 import UIKit
+// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 import FirebaseAuth
+// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 import JGProgressHUD
 
 class RegisterViewController: UIViewController {
@@ -112,6 +114,7 @@ class RegisterViewController: UIViewController {
         
         spinner.show(in: view)
         
+        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         // == Firebase register logic
         DatabaseManager.shared.userExists(with: email,
                                           completion: { [weak self] exists in
@@ -139,6 +142,7 @@ class RegisterViewController: UIViewController {
                     if success {
                         UserDefaults.standard.set(email, forKey: "email")
                         UserDefaults.standard.set(password, forKey: "password")
+                        UserDefaults.standard.set("\(firstname) \(lastname)", forKey: "name")
                         print("new user log in \(email)")
                         //upload image
                         guard let image = strongSelf.imageView.image,
@@ -162,6 +166,8 @@ class RegisterViewController: UIViewController {
                 strongSelf.navigationController?.dismiss(animated: true, completion: nil)
             })
         })
+        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
     }
     
     func alertUserRegisterError(message : String = "Please enter valid information to register") {
