@@ -40,11 +40,6 @@ class ConversationsViewController: UIViewController {
                                            height: 200)
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        unsubscribeFromConversations()
-    }
-    
     private func validateAuth() {
 //        let loggedIn = UserDefaults.standard.bool(forKey: "loggedIn")
 //        if !loggedIn {
@@ -129,7 +124,8 @@ class ConversationsViewController: UIViewController {
               }
         let conversationId = findConversationId(with : recipientEmail)
         let chatView = ChatViewController(with: recipientEmail, id: conversationId)
-        chatView.isNewConversation = conversationId == ""
+        print("123\(conversationId)")
+        chatView.isNewConversation = true
         chatView.title = firstname + " " + lastname
         chatView.navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(chatView, animated: true)
@@ -152,7 +148,9 @@ class ConversationsViewController: UIViewController {
                     switch result {
                     case .failure(let error) :
                         print("Failed fetch user \(error)")
-                        return
+                        // if no conversation Id , use a temporary id,
+                        // to be changed in the future
+                        returnValue = reverseConversationId
                     case .success(_) :
                         returnValue = reverseConversationId
                     }
@@ -239,9 +237,18 @@ extension ConversationsViewController : UITableViewDelegate, UITableViewDataSour
         tableView.deselectRow(at: indexPath, animated: true)
         let model = latestMessages[indexPath.row]
         
-        let conversationId = findConversationId(with : model.recipient_email)
-        let chatView = ChatViewController(with: model.recipient_email, id: conversationId)
-        chatView.title = model.recipient_name
+        guard let currentUserEmail = UserDefaults.standard.value(forKey: "email") as? String else {
+            return
+        }
+        let recipientEmail = model.recipient_email.elementsEqual(currentUserEmail) ? model.sender_email : model.recipient_email
+        guard let currentUserName = UserDefaults.standard.value(forKey: "name") as? String else {
+            return
+        }
+        let recipientName = model.recipient_name.elementsEqual(currentUserName) ? model.sender_name : model.recipient_name
+        
+        let conversationId = findConversationId(with : recipientEmail)
+        let chatView = ChatViewController(with: recipientEmail, id: conversationId)
+        chatView.title = recipientName
         chatView.navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(chatView, animated: true)
     }

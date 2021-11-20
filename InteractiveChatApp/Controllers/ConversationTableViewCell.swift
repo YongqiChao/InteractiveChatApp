@@ -77,7 +77,10 @@ class ConversationTableViewCell: UITableViewCell {
     // funcs
     public func configure(with model : LatestMessage) {
         self.userMessageLabel.text = model.content
-        self.userNameLabel.text = model.recipient_name
+        guard let currentUserName = UserDefaults.standard.value(forKey: "name") as? String else {
+            return
+        }
+        self.userNameLabel.text = model.recipient_name.elementsEqual(currentUserName) ? model.sender_name : model.recipient_name
         
         let photoUrl = "images/\(model.recipient_email)_profile_picture.png"
 //        StorageManeger.shared.downloadURL(for: photoUrl,

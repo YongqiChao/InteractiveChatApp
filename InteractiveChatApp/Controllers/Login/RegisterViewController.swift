@@ -142,7 +142,7 @@ class RegisterViewController: UIViewController {
                         UserDefaults.standard.set(email, forKey: "email")
                         UserDefaults.standard.set(password, forKey: "password")
                         UserDefaults.standard.set(true, forKey: "loggedIn")
-                        UserDefaults.standard.set("\(firstname)_\(lastname)", forKey: "name")
+                        UserDefaults.standard.set("\(firstname) \(lastname)", forKey: "name")
                         // upload picture
                         
                         UserDefaults.standard.set("url....", forKey: "photoUrl")

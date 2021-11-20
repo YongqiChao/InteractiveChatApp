@@ -22,6 +22,7 @@ class ChatViewController: MessagesViewController {
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
+        messagesCollectionView.clearsContextBeforeDrawing = true
         messageInputBar.delegate = self
         
         guard let currentUserEmail = UserDefaults.standard.value(forKey: "email") as? String else {
@@ -61,10 +62,10 @@ class ChatViewController: MessagesViewController {
         }
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        unsubscribeFromConversations()
-    }
+//    override func viewDidDisappear(_ animated: Bool) {
+//        super.viewDidDisappear(animated)
+//        unsubscribeFromConversations()
+//    }
     
     init(with email: String, id : String?) {
         self.otherUserEmail = email
@@ -126,7 +127,11 @@ class ChatViewController: MessagesViewController {
 //                }
 //            }
 //        })
+
         let queryMessage = Message.keys
+        guard let conversationId = conversationId  else {
+            return
+        }
         self.messagesSubscription = Amplify.DataStore.observeQuery(
             for: Message.self,
                where: queryMessage.conversationID.eq(conversationId))
@@ -138,13 +143,17 @@ class ChatViewController: MessagesViewController {
                     print("Error \(error)")
                 }
             } receiveValue: {
-                print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%2")
+                print("receiging values : \(conversationId)")
+                self.messages.removeAll()
                 for mess in $0.items {
                     // add recipient photo here
+                    print("receiging values : \(mess)")
+
                     let sender = Sender(senderId: mess.sender_email,
                                         displayName: mess.sender_name,
                                         photoURL: "")
                     guard let date = ChatViewController.dateFormatter.date(from: mess.date) else {
+                        print("receiging values  error123: \(mess)")
                         return
                     }
                     self.messages.append(DisplayMessage(messageId: mess.id,
@@ -152,6 +161,8 @@ class ChatViewController: MessagesViewController {
                                                    kind: .text(mess.content),
                                                    sender: sender))
                 }
+                print("reloading $$$$$$ ... ... ... messages ...")
+
                 DispatchQueue.main.async {
                     print("reloading ... ... ... messages ...")
                     self.messagesCollectionView.reloadDataAndKeepOffset()
