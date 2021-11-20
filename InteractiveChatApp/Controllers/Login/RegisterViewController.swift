@@ -6,10 +6,9 @@
 //
 
 import UIKit
-// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-import FirebaseAuth
-// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 import JGProgressHUD
+import Amplify
+import AmplifyPlugins
 
 class RegisterViewController: UIViewController {
 
@@ -27,11 +26,11 @@ class RegisterViewController: UIViewController {
             UINavigationBar.appearance().scrollEdgeAppearance = appearance
         }
         
-        // button actions
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Register",
-                                                            style: .done,
-                                                            target: self,
-                                                            action: #selector(didTapRegister) )
+//        // button actions
+//        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Register",
+//                                                            style: .done,
+//                                                            target: self,
+//                                                            action: #selector(didTapRegister) )
         registerButton.addTarget(self,
                               action: #selector(tappedRegisterButton),
                               for: .touchUpInside)
@@ -92,10 +91,10 @@ class RegisterViewController: UIViewController {
         presentPhotoActionSheet()
     }
     
-    @objc private func didTapRegister() {
-        let registerView = RegisterViewController()
-        navigationController?.pushViewController(registerView, animated: true)
-    }
+//    @objc private func didTapRegister() {
+//        let registerView = RegisterViewController()
+//        navigationController?.pushViewController(registerView, animated: true)
+//    }
     
     @objc private func tappedRegisterButton() {
         firstNameField.resignFirstResponder()
@@ -114,60 +113,48 @@ class RegisterViewController: UIViewController {
         
         spinner.show(in: view)
         
-        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-        // == Firebase register logic
-        DatabaseManager.shared.userExists(with: email,
-                                          completion: { [weak self] exists in
+        // check duplicate user
+        // user exist ? then skip
+        
+        // sign up
+        Amplify.Auth.signUp(username: email, password: password) { [weak self]  result in
             guard let strongSelf = self else { return }
-            
             DispatchQueue.main.async {
                 strongSelf.spinner.dismiss(animated: true)
             }
-            
-            guard !exists else {
-                strongSelf.alertUserRegisterError(message: "Email address exists")
-                return
-            }
-            
-            FirebaseAuth.Auth.auth().createUser(withEmail: email, password: password, completion: { authResult, error in
-                guard authResult != nil, error == nil else {
-                    print("Creating user error")
-                    return
+            switch result {
+            case .success(let signUpResult):
+                if case let .confirmUser(deliveryDetails, _) = signUpResult.nextStep {
+                                print("Delivery details \(String(describing: deliveryDetails))")
                 }
-                let chatAppUser = ChatAppUser(firstName: firstname,
-                                             lastName: lastname,
-                                             emailAddress: email )
-                DatabaseManager.shared.insertUser(with: chatAppUser,
-                                                  completion: { success in
-                    if success {
+                let user = User(id: email,
+                                first_name: firstname,
+                                last_name: lastname,
+                                LatestMessages: nil)
+                DatabaseManager.shared.addUser(with: user,
+                                               completion: { addUserResult in
+                    switch addUserResult {
+                    case true :
+                        print("New user Added")
+                        DispatchQueue.main.async {
+                            strongSelf.navigationController?.dismiss(animated: true, completion: nil)
+                        }
                         UserDefaults.standard.set(email, forKey: "email")
                         UserDefaults.standard.set(password, forKey: "password")
-                        UserDefaults.standard.set("\(firstname) \(lastname)", forKey: "name")
-                        print("new user log in \(email)")
-                        //upload image
-                        guard let image = strongSelf.imageView.image,
-                              let data = image.pngData() else {
-                                  print("profile picture upload failed")
-                                  return
-                              }
-                        let filename = chatAppUser.profilePictureName
-                        StorageManeger.shared.uploadProfilePicture(with: data,
-                                                                   fileName: filename,
-                                                                   completion: { result in
-                            switch result {
-                            case .success(let downloadURL) :
-                                UserDefaults.standard.set(downloadURL, forKey: "profile_picture_url")
-                            case .failure(let downloadError) :
-                                print("Download url error, \(downloadError)")
-                            }
-                        })
+                        UserDefaults.standard.set(true, forKey: "loggedIn")
+                        UserDefaults.standard.set("\(firstname)_\(lastname)", forKey: "name")
+                        // upload picture
+                        
+                        UserDefaults.standard.set("url....", forKey: "photoUrl")
+                    case false :
+                        print("New user add failed")
                     }
                 })
-                strongSelf.navigationController?.dismiss(animated: true, completion: nil)
-            })
-        })
-        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
+                print("SignUp Complete")
+            case .failure(let error):
+                print("An error occurred while registering a user \(error)")
+            }
+        }
     }
     
     func alertUserRegisterError(message : String = "Please enter valid information to register") {

@@ -75,22 +75,22 @@ class ConversationTableViewCell: UITableViewCell {
     static let identifier = "ConversationTableViewCell"
     
     // funcs
-    public func configure(with model : Conversation) {
-        self.userMessageLabel.text = model.latestMessage.text
-        self.userNameLabel.text = model.otherUserName
+    public func configure(with model : LatestMessage) {
+        self.userMessageLabel.text = model.content
+        self.userNameLabel.text = model.recipient_name
         
-        let path = "images/\(model.otherUserEmail)_profile_picture.png"
-        StorageManeger.shared.downloadURL(for: path,
-                                             completion: { [weak self] result in
-            switch result {
-            case .failure(let error) :
-                print("Failed to download image for chat: \(error)")
-            case .success(let url) :
-                DispatchQueue.main.async {
-                    self?.userImageView.sd_setImage(with: url, completed: nil)
-                }
-            }
-        })
+        let photoUrl = "images/\(model.recipient_email)_profile_picture.png"
+//        StorageManeger.shared.downloadURL(for: photoUrl,
+//                                             completion: { [weak self] result in
+//            switch result {
+//            case .failure(let error) :
+//                print("Failed to download image for chat: \(error)")
+//            case .success(let url) :
+//                DispatchQueue.main.async {
+//                    self?.userImageView.sd_setImage(with: url, completed: nil)
+//                }
+//            }
+//        })
     }
 
 }

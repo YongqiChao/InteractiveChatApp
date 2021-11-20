@@ -6,11 +6,11 @@
 //
 
 import UIKit
-// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-import FirebaseAuth
-// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 import SwiftUI
 import JGProgressHUD
+import Amplify
+import AmplifyPlugins
+import Combine
 
 class ConversationsViewController: UIViewController {
     
@@ -22,7 +22,6 @@ class ConversationsViewController: UIViewController {
         view.addSubview(tableView)
         view.addSubview(noConversationLabel)
         setupTableView()
-        fetchConversations()
         startListeningForConversations()
 //        view.backgroundColor = .black
     }
@@ -35,19 +34,45 @@ class ConversationsViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         tableView.frame = view.bounds
+        noConversationLabel.frame = CGRect(x: view.width / 2 - 180 ,
+                                           y: view.height / 2 - 50,
+                                           width: 350,
+                                           height: 200)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        unsubscribeFromConversations()
     }
     
     private func validateAuth() {
-        //let loggedIn = UserDefaults.standard.bool(forKey: "loggedIn")
-        //if !loggedIn {
-        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-        if FirebaseAuth.Auth.auth().currentUser == nil {
-            // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-            let loginView = LoginViewController()
-            let navigationView = UINavigationController(rootViewController: loginView)
-            navigationView.modalPresentationStyle = .fullScreen
-            present(navigationView, animated: true)
+//        let loggedIn = UserDefaults.standard.bool(forKey: "loggedIn")
+//        if !loggedIn {
+//        }
+        Amplify.Auth.fetchAuthSession { [weak self] result in
+            guard let strongSelf = self else { return }
+            switch result {
+            case .success(let session):
+                if !session.isSignedIn {
+                    DispatchQueue.main.async {
+                        strongSelf.showLoginViewController()
+                    }
+                }
+                print("Is user signed in - \(session.isSignedIn)")
+            case .failure(let error):
+                print("Fetch session failed with error \(error)")
+                DispatchQueue.main.async {
+                    strongSelf.showLoginViewController()
+                }
+            }
         }
+    }
+    
+    private func showLoginViewController() {
+        let loginView = LoginViewController()
+        let navigationView = UINavigationController(rootViewController: loginView)
+        navigationView.modalPresentationStyle = .fullScreen
+        self.present(navigationView, animated: true)
     }
     
     // ===============================================================================================
@@ -64,17 +89,20 @@ class ConversationsViewController: UIViewController {
     
     private let noConversationLabel: UILabel = {
         let label = UILabel()
-        label.text = "No Chats !"
+        label.text = "No Chats ! \n \n To add a chat by clicking the top right \"Compose\" button"
         label.textAlignment = .center
-        label.textColor = .gray
+        label.textColor = .link
         label.font = .systemFont(ofSize: 20, weight: .medium)
-        label.isHidden = true
+        label.isHidden = false
+        label.numberOfLines = 0
         return label
     }()
     
+    private var latestMessages = [LatestMessage]()
+    
     // ===============================================================================================
 
-    private var conversations = [Conversation]()
+ //  private var conversations = [Conversation]()
     
     // ===============================================================================================
     // funcs
@@ -82,10 +110,7 @@ class ConversationsViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
     }
-    
-    private func fetchConversations() {
-        tableView.isHidden = false
-    }
+
     
     @objc private func tappedComposeButton() {
         let newConversationView = NewConversationViewController()
@@ -96,41 +121,101 @@ class ConversationsViewController: UIViewController {
         present(newNaviagation, animated: true)
     }
     
-    private func createNewTemporaryConversation(result: [String: String]) {
-        guard let name = result["name"],
-              let email = result["email"] else {
+    private func createNewTemporaryConversation(result: User) {
+        guard let firstname = result.first_name as? String,
+              let lastname = result.last_name as? String,
+              let recipientEmail = result.id as? String else {
                   return
               }
-        
-        let chatView = ChatViewController(with: email, id: nil)
-        chatView.isNewConversation = true
-        chatView.title = name
+        let conversationId = findConversationId(with : recipientEmail)
+        let chatView = ChatViewController(with: recipientEmail, id: conversationId)
+        chatView.isNewConversation = conversationId == ""
+        chatView.title = firstname + " " + lastname
         chatView.navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(chatView, animated: true)
     }
     
+    private func findConversationId(with recipientEmail : String) -> String? {
+        guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
+            return nil
+        }
+        let conversationId = recipientEmail + "_" + email
+        let reverseConversationId = email + "_" + recipientEmail
+        var returnValue : String = ""
+        DatabaseManager.shared.getConversation(for: conversationId,
+                                                  completion: { result in
+            switch result {
+            case .failure(let error) :
+                print("Failed fetch user \(error)")
+                DatabaseManager.shared.getConversation(for: reverseConversationId,
+                                                          completion: { result in
+                    switch result {
+                    case .failure(let error) :
+                        print("Failed fetch user \(error)")
+                        return
+                    case .success(_) :
+                        returnValue = reverseConversationId
+                    }
+                })
+            case .success(_) :
+                returnValue = conversationId
+            }
+        })
+        while returnValue == "" {
+            sleep(1)
+        }
+        return returnValue
+    }
+    
+    var latestMessageSubscription: AnyCancellable?
     private func startListeningForConversations() {
         guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
             return
         }
-        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
-        DatabaseManager.shared.getAllConversations(for: safeEmail, completion: { [weak self] result in
-            switch result {
-            case.failure(let error) :
-                print("failed to get all conversations : \(error)")
-            case .success(let conversations) :
-                guard !conversations.isEmpty else {
-                    return
+        //let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+//        DatabaseManager.shared.getAllConversations(for: safeEmail, completion: { [weak self] result in
+//            switch result {
+//            case.failure(let error) :
+//                print("failed to get all conversations : \(error)")
+//            case .success(let conversations) :
+//                guard !conversations.isEmpty else {
+//                    return
+//                }
+//                self?.conversations = conversations
+//                DispatchQueue.main.async {
+//                    print("Yeah I got a message")
+//                    self?.tableView.reloadData()
+//                }
+//            }
+//        })
+        let queryLatestMessages = LatestMessage.keys
+        self.latestMessageSubscription = Amplify.DataStore.observeQuery(
+            for: LatestMessage.self,
+               where: queryLatestMessages.id.beginsWith("\(email)"))
+            .sink { completed in
+                switch completed {
+                case .finished:
+                    print("finished")
+                case .failure(let error):
+                    print("Error \(error)")
                 }
-                self?.conversations = conversations
+            } receiveValue: { querySnapshot in
+                self.latestMessages = querySnapshot.items
                 DispatchQueue.main.async {
-                    print("Yeah I got a message")
-                    self?.tableView.reloadData()
+                    if (querySnapshot.items.count > 0) {
+                        self.noConversationLabel.isHidden = true
+                        self.tableView.isHidden = false
+                        self.tableView.backgroundColor = .systemGray6
+                    }
+                    print("Yeah I got all latest message")
+                    self.tableView.reloadData()
                 }
             }
-        })
-        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        
+    }
+    // Then, when you're finished observing, cancel the subscription
+    func unsubscribeFromConversations() {
+        latestMessageSubscription?.cancel()
     }
     
 }
@@ -139,7 +224,7 @@ class ConversationsViewController: UIViewController {
 // ===============================================================================================
 extension ConversationsViewController : UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let model = conversations[indexPath.row]
+        let model = latestMessages[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: ConversationTableViewCell.identifier,
                                                  for: indexPath) as! ConversationTableViewCell
         cell.configure(with: model)
@@ -147,15 +232,16 @@ extension ConversationsViewController : UITableViewDelegate, UITableViewDataSour
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return conversations.count
+        return latestMessages.count
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let model = conversations[indexPath.row]
+        let model = latestMessages[indexPath.row]
         
-        let chatView = ChatViewController(with: model.otherUserEmail, id: model.id)
-        chatView.title = model.otherUserName
+        let conversationId = findConversationId(with : model.recipient_email)
+        let chatView = ChatViewController(with: model.recipient_email, id: conversationId)
+        chatView.title = model.recipient_name
         chatView.navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(chatView, animated: true)
     }
@@ -163,17 +249,4 @@ extension ConversationsViewController : UITableViewDelegate, UITableViewDataSour
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100
     }
-}
-
-struct Conversation {
-    let id : String
-    let otherUserName : String
-    let otherUserEmail : String
-    let latestMessage : LatestMessage
-}
-
-struct LatestMessage {
-    let date : String
-    let text : String
-    let isRead : Bool
 }

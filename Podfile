@@ -22,5 +22,6 @@ pod 'Amplify/Tools', '~> 1.0'       # allows to call amplify CLI from within Xco
 pod 'AmplifyPlugins/AWSCognitoAuthPlugin', '~> 1.0' # support for Cognito user authentication
 pod 'AmplifyPlugins/AWSAPIPlugin', '~> 1.0'         # support for GraphQL API
 pod 'AmplifyPlugins/AWSS3StoragePlugin', '~> 1.0'   # support for Amazon S3 storage
+pod 'AmplifyPlugins/AWSDataStorePlugin'
 
 end

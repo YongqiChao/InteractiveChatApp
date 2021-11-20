@@ -7,6 +7,7 @@
 
 import UIKit
 import JGProgressHUD
+import RealmSwift
 
 class NewConversationViewController: UIViewController {
     
@@ -38,8 +39,8 @@ class NewConversationViewController: UIViewController {
     // views
     private let spinner = JGProgressHUD(style: .dark)
     
-    private var users = [[String: String]]()
-    private var userFilterResult = [[String: String]]()
+    private var users = [User]()
+    private var userFilterResult = [User]()
     private var hasFetchedUsers = false
     
     private let searchBar: UISearchBar = {
@@ -71,7 +72,7 @@ class NewConversationViewController: UIViewController {
         dismiss(animated: true, completion: nil)
     }
     
-    public var completion : (([String: String]) -> (Void))?
+    public var completion : ((User) -> (Void))?
     
 }
 
@@ -93,8 +94,7 @@ extension NewConversationViewController : UISearchBarDelegate {
             filterUsers(with: username)
             self.updateUI()
         } else {
-            // no result, create new
-            DatabaseManager.shared.fetchAllUsers(completion: { [weak self] result in
+            DatabaseManager.shared.getAllUsers(completion: { [weak self] result in
                 switch result {
                 case .failure(let error) :
                     print("Failed fetch all useres \(error)")
@@ -106,6 +106,19 @@ extension NewConversationViewController : UISearchBarDelegate {
                     self?.updateUI()
                 }
             })
+//            // no result, create new
+//            DatabaseManager.shared.fetchAllUsers(completion: { [weak self] result in
+//                switch result {
+//                case .failure(let error) :
+//                    print("Failed fetch all useres \(error)")
+//                    self?.updateUI()
+//                case .success(let usersCollection) :
+//                    self?.hasFetchedUsers = true
+//                    self?.users = usersCollection
+//                    self?.filterUsers(with: username)
+//                    self?.updateUI()
+//                }
+//            })
         }
     }
     
@@ -127,12 +140,15 @@ extension NewConversationViewController : UISearchBarDelegate {
             return
         }
 
-        let userFilterResult : [[String : String]] = self.users.filter({
-            guard let name = $0["name"]?.lowercased() else {
+        let userFilterResult : [User] = self.users.filter({
+            guard let firstname = $0.first_name.lowercased() as? String else {
+                return false
+            }
+            guard let lastname = $0.last_name.lowercased() as? String else {
                 return false
             }
             
-            return name.hasPrefix(inputName.lowercased())
+            return firstname.hasPrefix(inputName.lowercased()) || lastname.hasPrefix(inputName.lowercased())
         })
         self.userFilterResult = userFilterResult
     }
@@ -142,7 +158,8 @@ extension NewConversationViewController : UISearchBarDelegate {
 extension NewConversationViewController : UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.textLabel?.text = userFilterResult[indexPath.row]["name"]
+        cell.textLabel?.text = userFilterResult[indexPath.row].first_name + " " +
+        userFilterResult[indexPath.row].last_name // ["name"]
         return cell
     }
     

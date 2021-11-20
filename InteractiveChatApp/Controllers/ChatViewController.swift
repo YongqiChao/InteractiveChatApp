@@ -8,23 +8,49 @@
 import UIKit
 import MessageKit
 import InputBarAccessoryView
+import Amplify
+import Combine
 
 class ChatViewController: MessagesViewController {
+    public var sender : User?
+    public var recipient : User?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .lightGray
         
-//        messages.append(Message(messageId: "",
-//                                sentDate: Date(),
-//                                kind: .text("first chat"),
-//                                sender: selfSender))
-                        
-        
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
         messageInputBar.delegate = self
+        
+        guard let currentUserEmail = UserDefaults.standard.value(forKey: "email") as? String else {
+            return
+        }
+        DatabaseManager.shared.getUser(for: currentUserEmail,
+                                          completion: { result in
+            switch result {
+            case .failure(let error) :
+                print("Failed fetch user \(error)")
+            case .success(let user) :
+                self.sender = User(id: user.id,
+                              first_name: user.first_name,
+                              last_name: user.last_name,
+                              LatestMessages: user.LatestMessages)
+            }
+        })
+        DatabaseManager.shared.getUser(for: otherUserEmail,
+                                          completion: {result in
+            switch result {
+            case .failure(let error) :
+                print("Failed fetch user \(error)")
+            case .success(let user) :
+                self.recipient = User(id: user.id,
+                              first_name: user.first_name,
+                              last_name: user.last_name,
+                              LatestMessages: user.LatestMessages)
+            }
+        })
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -33,6 +59,11 @@ class ChatViewController: MessagesViewController {
         if let conversationId = conversationId {
             listenForMessages(id: conversationId, shouldScrollToBottom: true)
         }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        unsubscribeFromConversations()
     }
     
     init(with email: String, id : String?) {
@@ -47,9 +78,9 @@ class ChatViewController: MessagesViewController {
     
     // data
     public let otherUserEmail: String
-    private let conversationId: String?
+    private var conversationId: String?
     public var isNewConversation = false
-    private var messages = [Message]()
+    private var messages = [DisplayMessage]()
     public static let dateFormatter : DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
@@ -60,43 +91,96 @@ class ChatViewController: MessagesViewController {
     
     // myself
     private var selfSender : Sender? = {
-        guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
+        guard let email = UserDefaults.standard.value(forKey: "email") as? String,
+              let name = UserDefaults.standard.value(forKey: "name") as? String
+              //let photoUrl = UserDefaults.standard.value(forKey: "photoUrl") as? String
+        else {
             return nil
         }
-        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
-        return Sender(senderId: safeEmail,
-               displayName: "123",
+        //let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+        return Sender(senderId: email,
+               displayName: name,
                photoURL: "")
     }()
     
     //funcs
+    var messagesSubscription: AnyCancellable?
     private func listenForMessages(id : String, shouldScrollToBottom : Bool) {
-        DatabaseManager.shared.getAllMessagesForConversation(with: id,
-                                                             completion: { [weak self] result in
-            switch result {
-            case . failure(let error) :
-                print("Failed to listen all messages for a conversation: \(error)")
-            case .success(let messages) :
-                guard !messages.isEmpty else {
-                    print("There is no message in this chat")
-                    return
+//        DatabaseManager.shared.getAllMessagesForConversation(with: id,
+//                                                             completion: { [weak self] result in
+//            switch result {
+//            case . failure(let error) :
+//                print("Failed to listen all messages for a conversation: \(error)")
+//            case .success(let messages) :
+//                guard !messages.isEmpty else {
+//                    print("There is no message in this chat")
+//                    return
+//                }
+//                self?.messages = messages
+//                DispatchQueue.main.async {
+//                    print("reloading ... ... ... messages ...")
+//                    self?.messagesCollectionView.reloadDataAndKeepOffset()
+//                    if shouldScrollToBottom {
+//                        self?.messagesCollectionView.scrollToLastItem()
+//                    }
+//                }
+//            }
+//        })
+        let queryMessage = Message.keys
+        self.messagesSubscription = Amplify.DataStore.observeQuery(
+            for: Message.self,
+               where: queryMessage.conversationID.eq(conversationId))
+            .sink { completed in
+                switch completed {
+                case .finished:
+                    print("finished")
+                case .failure(let error):
+                    print("Error \(error)")
                 }
-                self?.messages = messages
+            } receiveValue: {
+                print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%2")
+                for mess in $0.items {
+                    // add recipient photo here
+                    let sender = Sender(senderId: mess.sender_email,
+                                        displayName: mess.sender_name,
+                                        photoURL: "")
+                    guard let date = ChatViewController.dateFormatter.date(from: mess.date) else {
+                        return
+                    }
+                    self.messages.append(DisplayMessage(messageId: mess.id,
+                                                   sentDate: date ,
+                                                   kind: .text(mess.content),
+                                                   sender: sender))
+                }
                 DispatchQueue.main.async {
                     print("reloading ... ... ... messages ...")
-                    self?.messagesCollectionView.reloadDataAndKeepOffset()
+                    self.messagesCollectionView.reloadDataAndKeepOffset()
                     if shouldScrollToBottom {
-                        self?.messagesCollectionView.scrollToLastItem()
+                        self.messagesCollectionView.scrollToLastItem()
                     }
                 }
             }
-        })
     }
+    // Then, when you're finished observing, cancel the subscription
+    func unsubscribeFromConversations() {
+        messagesSubscription?.cancel()
+    }
+//    private func convertMessages(with preConvertMessages : [Message]) -> [DisplayMessage] {
+//        var convertedMessages = [DisplayMessage]()
+//        guard let thissender = selfSender else {
+//            return convertedMessages
+//        }
+//        for mes in preConvertMessages {
+//            convertedMessages.append(DisplayMessage(messageId: mes.id,
+//                                                    sentDate: Date(),
+//                                                    kind: mes.type,
+//                                                    sender: thissender))
+//        }
+//        return convertedMessages
+//    }
     
 }
-
-
-struct Message : MessageType {
+struct DisplayMessage : MessageType {
     public var messageId: String
     public var sentDate: Date
     public var kind: MessageKind
@@ -107,25 +191,25 @@ extension MessageKind {
     var rawData : String {
         switch self {
         case .text(_):
-            return "text"
+            return "TEXT"
         case .attributedText(_):
-            return "attributed_text"
+            return "ATTRIBUTEDTEXT"
         case .photo(_):
-            return "photo"
+            return "PHOTO"
         case .video(_):
-            return "video"
+            return "VIDEO"
         case .location(_):
-            return "location"
+            return "LOCATION"
         case .emoji(_):
-            return "emoji"
+            return "EMOJI"
         case .audio(_):
-            return "audio"
+            return "AUDIO"
         case .contact(_):
-            return "contact"
+            return "CONTACT"
         case .linkPreview(_):
-            return "linkPreview"
+            return "LINKPREVIEW"
         case .custom(_):
-            return "custom_data"
+            return "CUSTOM"
         }
     }
 }
@@ -146,7 +230,7 @@ extension ChatViewController : MessagesLayoutDelegate,
         }
         fatalError("Error : self sender is nil, no email was cached")
     }
-    
+
     func messageForItem(at indexPath: IndexPath,
                         in messagesCollectionView: MessagesCollectionView) -> MessageType {
         return messages[indexPath.section]
@@ -160,57 +244,67 @@ extension ChatViewController : MessagesLayoutDelegate,
 
 extension ChatViewController : InputBarAccessoryViewDelegate {
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
-        guard !text.replacingOccurrences(of: " ", with: "").isEmpty,
-              let selfSender = self.selfSender,
-              let messageId = createMessageId() else {
+
+        guard !text.replacingOccurrences(of: " ", with: "").isEmpty
+              //let selfSender = self.selfSender,
+             // let messageId = createMessageId(),
+              else {
             return
         }
-        
-        let message = Message(messageId: messageId,
-                              sentDate: Date(),
-                              kind: .text(text),
-                              sender: selfSender)
+
+        let dateString = Self.dateFormatter.string(from: Date())
+        guard let thisSender = self.sender,
+              let thisRecipient = self.recipient else {
+                  return
+              }
+        if (conversationId == nil)  {
+            conversationId = createConversationId()
+        }
+        guard let conversationId = conversationId  else {
+            return
+        }
+        let message = Message(id: conversationId + dateString,
+                              content: text,
+                              date: dateString,
+                              recipient_email: thisRecipient.id,
+                              recipient_name: thisRecipient.first_name + " " + thisRecipient.last_name,
+                              sender_name: thisSender.first_name + " " + thisSender.last_name,
+                              sender_email: thisSender.id,
+                              is_read: false,
+                              type: MesKind.text,
+                              conversationID: conversationId)
         if isNewConversation {
             //create a new chat
-            DatabaseManager.shared.createNewConversation(with: otherUserEmail,
-                                                         otherUserName: self.title ?? "Unknown User",
-                                                         firstMessage: message,
-                                                         completion: { [weak self] success in
-                if success {
-                    print("Sent message")
-                    self?.isNewConversation = false
-                } else {
-                    print("Sent message Failed")
-                }
-            })
-        } else {
-            // append existing chat
-            guard let conversationId = conversationId,
-            let name = self.title  else {
-                return
-            }
-            DatabaseManager.shared.sendMessage(to: conversationId,
-                                               otherUserEmail: otherUserEmail,
-                                               name: name,
-                                               newMessage: message,
-                                               completion: { success in
-                if success {
-                    print("Sent message")
-                }
-                else {
-                    print("Send message failed")
+            DatabaseManager.shared.addConversation(with: conversationId,
+                                                   completion: { result in
+                switch result {
+                case false :
+                    print("Failed to create new conversation")
+                case true :
+                    print("Created new conversation")
+                    self.isNewConversation = false
                 }
             })
         }
+        DatabaseManager.shared.addMessage(with: message,
+                                          completion: { result in
+            switch result {
+            case false :
+                print("Failed to create new message")
+            case true :
+                print("Created new message")
+                inputBar.inputTextView.text = ""
+            }
+        })
     }
     
-    private func createMessageId() -> String? {
-        let dateString = Self.dateFormatter.string(from: Date())
+    private func createConversationId() -> String? {
+        //let dateString = Self.dateFormatter.string(from: Date())
         guard let currentUserEmail = UserDefaults.standard.value(forKey: "email") as? String else {
             return nil
         }
-        let safeCurrentUserEmail = DatabaseManager.safeEmail(emailAddress: currentUserEmail)
-        let newIdentifier = "\(otherUserEmail)_\(safeCurrentUserEmail)_\(dateString)"
+        //let safeCurrentUserEmail = DatabaseManager.safeEmail(emailAddress: currentUserEmail)
+        let newIdentifier = "\(currentUserEmail)_\(otherUserEmail)"
         return newIdentifier
     }
     

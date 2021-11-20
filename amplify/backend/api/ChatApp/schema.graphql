@@ -1,0 +1,51 @@
+type LatestMessage @model @auth(rules: [{allow: public}]) @key(name: "byUser", fields: ["userID"]) {
+  id: ID!
+  date: String!
+  content: String!
+  is_read: Boolean!
+  type: MesKind!
+  recipient_name: String!
+  recipient_email: String!
+  sender_email: String!
+  sender_name: String!
+  userID: ID
+}
+
+type User @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  first_name: String!
+  last_name: String!
+  LatestMessages: [LatestMessage] @connection(keyName: "byUser", fields: ["id"])
+}
+
+type Conversation @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  Messages: [Message] @connection(keyName: "byConversation", fields: ["id"])
+}
+
+enum MesKind {
+  TEXT
+  ATTRIBUTEDTEXT
+  PHOTO
+  VIDEO
+  LOCATION
+  EMOJI
+  AUDIO
+  CONTACT
+  LINKPREVIEW
+  CUSTOM
+}
+
+type Message @model @auth(rules: [{allow: public}]) @key(name: "byConversation", fields: ["conversationID"]) {
+  id: ID!
+  content: String!
+  date: String!
+  recipient_email: String!
+  recipient_name: String!
+  sender_name: String!
+  sender_email: String!
+  is_read: Boolean!
+  type: MesKind!
+  conversationID: ID
+}
+ 

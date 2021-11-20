@@ -1,0 +1,18 @@
+{
+  "resourceName": "s3bb376817",
+  "policyUUID": "bb376817",
+  "bucketName": "chatapp1b4407a62c4e4b11b614a43925fa39a3",
+  "storageAccess": "authAndGuest",
+  "guestAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "authAccess": [
+    "READ",
+    "CREATE_AND_UPDATE",
+    "DELETE"
+  ],
+  "triggerFunction": "NONE",
+  "groupAccess": {}
+}

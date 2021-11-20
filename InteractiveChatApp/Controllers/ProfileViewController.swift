@@ -4,11 +4,11 @@
 //
 //  Created by Yongqi Chao on 11/10/21.
 //
-
 import UIKit
-// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-import FirebaseAuth
-// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+import Amplify
+import AmplifyPlugins
+import AWSS3
+
 
 class ProfileViewController: UIViewController {
     
@@ -51,17 +51,17 @@ class ProfileViewController: UIViewController {
         imageView.backgroundColor = .white
         headerView.addSubview(imageView)
         
-        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-        StorageManeger.shared.downloadURL(for: path,
-                                             completion: { [weak self] result in
-            switch result {
-            case .failure(let error) :
-                print("Failed to get download url : \(error)")
-            case .success(let url) :
-                self?.downloadImage(imageView: imageView, url: url)
-            }
-        })
-        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+//        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+//        StorageManeger.shared.downloadURL(for: path,
+//                                             completion: { [weak self] result in
+//            switch result {
+//            case .failure(let error) :
+//                print("Failed to get download url : \(error)")
+//            case .success(let url) :
+//                self?.downloadImage(imageView: imageView, url: url)
+//            }
+//        })
+//        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         return headerView
     }
     
@@ -103,21 +103,22 @@ extension ProfileViewController : UITableViewDelegate , UITableViewDataSource {
                                             style: .destructive,
                                             handler: { [weak self] _ in
             guard let strongSelf = self else { return }
-            do {
-                // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-                try FirebaseAuth.Auth.auth().signOut()
-                // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-                let loginView = LoginViewController()
-                let navigationView = UINavigationController(rootViewController: loginView)
-                navigationView.modalPresentationStyle = .fullScreen
-                strongSelf.present(navigationView, animated: true)
+            Amplify.Auth.signOut() { result in
+                switch result {
+                case .success:
+                    print("Successfully signed out")
+                    DispatchQueue.main.async {
+                        let loginView = LoginViewController()
+                        let navigationView = UINavigationController(rootViewController: loginView)
+                        navigationView.modalPresentationStyle = .fullScreen
+                        strongSelf.present(navigationView, animated: true)
+                    }
+                case .failure(let error):
+                    print("Sign out failed with error \(error)")
+                }
             }
-            catch {
-                // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-                print("firebase log out Failed")
-                // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-            }
-        }))
+        }
+                                           ))
         
         actionSheet.addAction(UIAlertAction(title: "Cancel",
                                             style: .cancel,
@@ -125,4 +126,5 @@ extension ProfileViewController : UITableViewDelegate , UITableViewDataSource {
         
         present(actionSheet, animated: true)
     }
+    
 }

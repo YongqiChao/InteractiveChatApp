@@ -14,6 +14,10 @@ PODS:
     - AWSCore (~> 2.26.1)
     - AWSMobileClient (~> 2.26.1)
     - AWSPluginsCore (= 1.15.6)
+  - AmplifyPlugins/AWSDataStorePlugin (1.15.6):
+    - AWSCore (~> 2.26.1)
+    - AWSPluginsCore (= 1.15.6)
+    - SQLite.swift (= 0.12.2)
   - AmplifyPlugins/AWSS3StoragePlugin (1.15.6):
     - AWSCore (~> 2.26.1)
     - AWSPluginsCore (= 1.15.6)
@@ -159,6 +163,9 @@ PODS:
   - SDWebImage (5.12.1):
     - SDWebImage/Core (= 5.12.1)
   - SDWebImage/Core (5.12.1)
+  - SQLite.swift (0.12.2):
+    - SQLite.swift/standard (= 0.12.2)
+  - SQLite.swift/standard (0.12.2)
   - Starscream (3.1.1)
 
 DEPENDENCIES:
@@ -166,6 +173,7 @@ DEPENDENCIES:
   - Amplify/Tools (~> 1.0)
   - AmplifyPlugins/AWSAPIPlugin (~> 1.0)
   - AmplifyPlugins/AWSCognitoAuthPlugin (~> 1.0)
+  - AmplifyPlugins/AWSDataStorePlugin
   - AmplifyPlugins/AWSS3StoragePlugin (~> 1.0)
   - Firebase/Auth
   - Firebase/Core
@@ -209,6 +217,7 @@ SPEC REPOS:
     - Realm
     - RealmSwift
     - SDWebImage
+    - SQLite.swift
     - Starscream
 
 SPEC CHECKSUMS:
@@ -243,8 +252,9 @@ SPEC CHECKSUMS:
   Realm: 869ab2a7e3bdfa6bf06d8723251539f504e6f602
   RealmSwift: f1f51c4a02fe826e5cea623b5441992f06bdc942
   SDWebImage: 4dc3e42d9ec0c1028b960a33ac6b637bb432207b
+  SQLite.swift: d2b4642190917051ce6bd1d49aab565fe794eea3
   Starscream: 4bb2f9942274833f7b4d296a55504dcfc7edb7b0
 
-PODFILE CHECKSUM: 012ed0811275ddae191739980e8351a9549ba9ce
+PODFILE CHECKSUM: a943b9f585cd074cd5964ac777773854feb7d7a9
 
 COCOAPODS: 1.11.2

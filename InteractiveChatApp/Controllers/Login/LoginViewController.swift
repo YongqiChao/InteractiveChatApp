@@ -6,41 +6,40 @@
 //
 
 import UIKit
-// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-import FirebaseAuth
-// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 import JGProgressHUD
+// import libraries for AWS authtification
+import Amplify
+import AmplifyPlugins
+
 
 class LoginViewController: UIViewController {
-
+    
+    // MARK: - Internal functions
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         title = "Login"
         view.backgroundColor = .white
-        
-        // in ios 15 the navigation bar is transparent
+        // Add color for navigation bar, in ios 15 , it is transparent
         if #available(iOS 15, *) {
             let appearance = UINavigationBarAppearance()
             appearance.configureWithOpaqueBackground()
             UINavigationBar.appearance().standardAppearance = appearance
             UINavigationBar.appearance().scrollEdgeAppearance = appearance
         }
-        
-        // button actions
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Register",
-                                                            style: .done,
-                                                            target: self,
-                                                            action: #selector(didTapRegister) )
+        // Add an action for Register button
+        navigationItem.rightBarButtonItem =
+        UIBarButtonItem(title: "Register",
+                        style: .done,
+                        target: self,
+                        action: #selector(didTapRegister) )
+        // Add an action for Login button
         loginButton.addTarget(self,
                               action: #selector(tappedLoginButton),
                               for: .touchUpInside)
-        
-        // delegates
+        // Add delegates
         emailField.delegate = self
         passwordField.delegate = self
-        
-        // add sub views
+        // Add sub views
         view.addSubview(scrollView)
         scrollView.addSubview(imageView)
         scrollView.addSubview(emailField)
@@ -51,7 +50,7 @@ class LoginViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         scrollView.frame = view.bounds
-        imageView.frame = CGRect(x: (scrollView.width - scrollView.width/3)/2  ,
+        imageView.frame = CGRect(x: (scrollView.width - scrollView.width/3)/2 ,
                                  y: 50,
                                  width: scrollView.width/3,
                                  height: scrollView.width/3)
@@ -70,76 +69,7 @@ class LoginViewController: UIViewController {
                                    height: 50)
     }
     
-    // helper functions
-    
-    @objc private func didTapRegister() {
-        let registerView = RegisterViewController()
-        navigationController?.pushViewController(registerView, animated: true)
-    }
-    
-    @objc private func tappedLoginButton() {
-        emailField.resignFirstResponder()
-        passwordField.resignFirstResponder()
-        
-        guard let email = emailField.text, let password = passwordField.text,
-              !email.isEmpty, !password.isEmpty, password.count >= 6 else {
-                  alertUserLoginError()
-                  return
-              }
-        
-        spinner.show(in: view)
-        
-        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-        // === Firebase log in logic
-        FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password, completion: { [weak self] authResult, error in
-            guard let strongSelf = self else { return }
-            
-            DispatchQueue.main.async {
-                strongSelf.spinner.dismiss(animated: true)
-            }
-            
-            guard let result = authResult, error == nil else {
-                print("failed to log in")
-                strongSelf.alertUserLoginError()
-                return
-            }
-            let user = result.user
-            let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
-            DatabaseManager.shared.getDataFor(path: safeEmail,
-                                              completion: { result in
-                switch result {
-                case .success(let data) :
-                    guard let userData = data as? [String : Any],
-                          let firstName = userData["first_name"] as? String,
-                          let lastName = userData["last_name"] as? String else {
-                        return
-                    }
-                    UserDefaults.standard.set("\(firstName) \(lastName)", forKey: "name")
-                case .failure(let error) :
-                    print("Failed to read data with error \(error)")
-                }
-            })
-            UserDefaults.standard.set(email, forKey: "email")
-            UserDefaults.standard.set(password, forKey: "password")
-            print("new user log in \(user)")
-            strongSelf.navigationController?.dismiss(animated: true, completion: nil)
-        })
-        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-        
-    }
-    
-    func alertUserLoginError(message : String = "Please enter valid information to log in") {
-        let alert = UIAlertController(title: "Login Error",
-                                      message: message,
-                                      preferredStyle:  .alert)
-        alert.addAction(UIAlertAction(title: "Dismiss",
-                                      style: .cancel,
-                                      handler: nil))
-        present(alert, animated: true)
-    }
-    
-    // helper views
-    
+    // MARK: - views , fields, buttons
     private let spinner = JGProgressHUD(style: .dark)
     
     private let scrollView : UIScrollView = {
@@ -158,9 +88,7 @@ class LoginViewController: UIViewController {
         imageView.layer.borderColor = UIColor.link.cgColor
         return imageView
     }()
-    
-    // helper fields, buttons
-    
+        
     private let emailField : UITextField = {
         let emailField = UITextField()
         emailField.returnKeyType = .continue
@@ -169,10 +97,15 @@ class LoginViewController: UIViewController {
         emailField.layer.cornerRadius = 10
         emailField.layer.borderWidth = 1
         emailField.layer.borderColor = UIColor.lightGray.cgColor
-        emailField.attributedPlaceholder = NSAttributedString(string: "Enter email address",
-                                                       attributes: [NSAttributedString.Key.foregroundColor: UIColor.black])
+        emailField.attributedPlaceholder =
+        NSAttributedString(string: "Enter email address",
+                           attributes: [NSAttributedString.Key.foregroundColor:
+                                            UIColor.black])
         emailField.backgroundColor = .white
-        emailField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 0))
+        emailField.leftView = UIView(frame: CGRect(x: 0,
+                                                   y: 0,
+                                                   width: 10,
+                                                   height: 0))
         emailField.leftViewMode = .always
         emailField.textColor = .black
         return emailField
@@ -186,10 +119,15 @@ class LoginViewController: UIViewController {
         passwordField.layer.cornerRadius = 10
         passwordField.layer.borderWidth = 1
         passwordField.layer.borderColor = UIColor.lightGray.cgColor
-        passwordField.attributedPlaceholder = NSAttributedString(string: "Enter password",
-                                                       attributes: [NSAttributedString.Key.foregroundColor: UIColor.black])
+        passwordField.attributedPlaceholder =
+        NSAttributedString(string: "Enter password",
+                           attributes: [NSAttributedString.Key.foregroundColor:
+                                            UIColor.black])
         passwordField.backgroundColor = .white
-        passwordField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 0))
+        passwordField.leftView = UIView(frame: CGRect(x: 0,
+                                                      y: 0,
+                                                      width: 10,
+                                                      height: 0))
         passwordField.leftViewMode = .always
         passwordField.isSecureTextEntry = true
         passwordField.textColor = .black
@@ -206,10 +144,11 @@ class LoginViewController: UIViewController {
         loginButton.titleLabel?.font = .systemFont(ofSize: 25, weight: .bold)
         return loginButton
     }()
+    
 }
 
 
-
+// MARK: - extenstion for text delegate
 extension LoginViewController : UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -221,4 +160,71 @@ extension LoginViewController : UITextFieldDelegate {
         }
         return true
     }
+}
+
+// MARK: - extenstion for helper funcs: ShowAlert , Button pressed, Login Logic
+extension LoginViewController {
+    
+    // show login alerts to users
+    func alertUserLoginError(
+        message: String = "Please enter valid information to log in") {
+        let alert = UIAlertController(title: "Login Error",
+                                      message: message,
+                                      preferredStyle:  .alert)
+        alert.addAction(UIAlertAction(title: "Dismiss",
+                                      style: .cancel,
+                                      handler: nil))
+        present(alert, animated: true)
+    }
+    
+    // selecter for Login button pressed
+    @objc private func tappedLoginButton() {
+        emailField.resignFirstResponder()
+        passwordField.resignFirstResponder()
+        // guard all input values from login screen
+        guard let email = emailField.text,
+              let password = passwordField.text,
+              !email.isEmpty,
+              !password.isEmpty,
+              password.count >= 6 else {
+                  alertUserLoginError()
+                  return
+              }
+        // Start a progress HUD
+        spinner.show(in: view)
+        
+        // AWS Amplify log in logic
+        _ = Amplify.Auth.signIn(username: email,
+                                password: password) { [weak self] result in
+            guard let strongSelf = self else { return }
+            // Stop the progress HUD
+            DispatchQueue.main.async {
+                strongSelf.spinner.dismiss(animated: true)
+            }
+
+            switch result {
+            case .success(_):
+                UserDefaults.standard.set(email, forKey: "email")
+                UserDefaults.standard.set(password, forKey: "password")
+                UserDefaults.standard.set(true, forKey: "loggedIn")
+                print("Sign in succeeded")
+                // refresh the UI
+                DispatchQueue.main.async {
+                    strongSelf.navigationController?.dismiss(animated: true, completion: nil)
+                }
+            case .failure(let error):
+                print("Sign in failed \(error)")
+                DispatchQueue.main.async {
+                    strongSelf.alertUserLoginError()
+                }
+            }
+        }
+    }
+    
+    // selecter for tap Register button
+    @objc private func didTapRegister() {
+        let registerView = RegisterViewController()
+        navigationController?.pushViewController(registerView, animated: true)
+    }
+    
 }
